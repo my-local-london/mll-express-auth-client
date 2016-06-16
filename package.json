@@ -1,0 +1,27 @@
+{
+  "name": "mll-express-auth-client-node",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/my-local-london/mll-express-auth-client-node.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/my-local-london/mll-express-auth-client-node/issues"
+  },
+  "homepage": "https://github.com/my-local-london/mll-express-auth-client-node#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "mll-api-request-node": "git+https://github.com/my-local-london/mll-api-request-node.git"
+  },
+  "devDependencies": {
+    "body-parser": "^1.15.1",
+    "express": "^4.13.4"
+  }
+}
