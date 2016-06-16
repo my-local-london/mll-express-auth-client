@@ -114,29 +114,41 @@ module.exports = {
             requiredPermissions ? next(new NoUser('No user for session key')) : next();
           }
 
-          return function (req, res, next) {
-            self.lookupSessionFromRequest(req)
+          function attachSessionToRequest(req) {
+            if (req.session) {
+              return Promise.resolve();
+            }
+            if (req.noSession) {
+              throw NoUser('No session found.');
+            }
+            return self.lookupSessionFromRequest(req)
               .then(function (response) {
                 if (!response) {
-                  noUserFound(next);
-                } else {
-                  req.session = response.session;
-                  const flatRoles = _.flatMap(req.session.roles, function (permissions, group) {
-                    return _.map(permissions, function (permission) {
-                      return [group, permission].join('.');
-                    });
+                  req.noSession = true;
+                  throw NoUser('No session found.');
+                }
+                req.session = response.session;
+              });
+          }
+
+          return function (req, res, next) {
+            attachSessionToRequest(req)
+              .then(function () {
+                const flatRoles = _.flatMap(req.session.roles, function (permissions, group) {
+                  return _.map(permissions, function (permission) {
+                    return [group, permission].join('.');
                   });
-                  const missingPermissions = _.compact(_.map(args, function (flatRequiredPermission) {
-                    if (flatRoles.indexOf(flatRequiredPermission) === -1) {
-                      return flatRequiredPermission;
-                    }
-                  }));
-                  if (missingPermissions.length > 0) {
-                    const missingList = missingPermissions.join(', ');
-                    next(new ForbiddenUser('Missing permissions: ' + missingList));
-                  } else {
-                    next();
+                });
+                const missingPermissions = _.compact(_.map(args, function (flatRequiredPermission) {
+                  if (flatRoles.indexOf(flatRequiredPermission) === -1) {
+                    return flatRequiredPermission;
                   }
+                }));
+                if (missingPermissions.length > 0) {
+                  const missingList = missingPermissions.join(', ');
+                  next(new ForbiddenUser('Missing permissions: ' + missingList));
+                } else {
+                  next();
                 }
               })
               .catch(function (err) {
@@ -144,7 +156,9 @@ module.exports = {
               });
           }
         }
-      };
+      }
+      ;
     return self;
   }
-};
+}
+;

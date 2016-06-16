@@ -11,11 +11,13 @@ function getLoginStatus(req) {
   return `<h4>You are ${state}</h4>`;
 }
 
-app.get('/user', [auth.middleware()], function (req, res) {
+app.use(auth.middleware());
+
+app.get('/user', function (req, res) {
   res.send(req.session || {noSession: true});
 });
 
-app.get('/', [auth.middleware()], (req, res) => {
+app.get('/', (req, res) => {
   "use strict";
 
   res.send([
@@ -48,7 +50,7 @@ ${description}</textarea><p><input type="submit" value="submit"/></p>`);
   });
 });
 
-app.get('/login', [auth.middleware()], (req, res) => {
+app.get('/login', (req, res) => {
   "use strict";
   if (req.user) {
     res.send(getLoginStatus(req));
